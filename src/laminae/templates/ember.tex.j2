@@ -1,0 +1,107 @@
+%------------------------------------------------------------------------------
+% laminae :: "ember" template
+% Warm orange Boadilla/crane theme, ported from the original beamerfy
+% "chessOrange" template. Includes a tikz "table" matrix style available to
+% RawLatexSlide content. Requires the system fonts Palatino, Helvetica, and
+% Monaco (via fontspec) plus the `markdown` CTAN package, so — unlike "clean"
+% and "accent" — it needs more than a stock, font-agnostic TeX Live install.
+%------------------------------------------------------------------------------
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fontspec}
+\setmainfont[Scale=0.9,Mapping=tex-text]{Palatino}
+\setsansfont[Scale=0.8,Mapping=tex-text]{Helvetica}
+\setmonofont[Scale=0.8]{Monaco}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage[smartEllipses]{markdown}
+
+\usetikzlibrary{positioning}
+\usetikzlibrary{fit}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes}
+\usetikzlibrary{mindmap}
+\usetikzlibrary{decorations.text}
+\pgfplotsset{compat=1.7}
+
+\definecolor{bittersweet}{HTML}{FFB200}
+\definecolor{silverblue}{HTML}{6495ED}
+\definecolor{truegreen}{HTML}{2E8728}
+\definecolor{bricklike}{HTML}{8E8176}
+\definecolor{lightbrick}{HTML}{F8F7F3}
+\definecolor{bricknum}{HTML}{A93226}
+
+\usetheme{Boadilla}
+\usecolortheme{crane}
+
+\setbeamertemplate{footline}[frame number]
+\setbeamersize{text margin left=1.5em,text margin right=1.5em}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{enumerate items}{(\arabic{enumi})}
+\setbeamercolor{local structure}{fg=bricknum}
+\setbeamertemplate{itemize items}[circle]
+\setbeamercovered{transparent=15}
+\setbeamercolor{titlelike}{parent=structure,bg=bittersweet}
+
+\makeatletter
+\usetikzlibrary{matrix}
+\tikzset{
+    table/.style={
+        matrix of nodes,
+        row sep=-\pgflinewidth,
+        column sep=-\pgflinewidth,
+        ampersand replacement=\&,
+        nodes={
+            rectangle,
+            draw=black,
+            anchor=center,
+            text height=0.75em,
+            text depth=.05cm,
+            inner sep=2pt,
+            minimum width=1cm,
+            minimum height=2em
+        },
+        align=center,
+        nodes in empty cells,
+        every even row/.style={
+            nodes={fill=lightbrick}
+        },
+        column 1/.style={
+            nodes={font=\bfseries}
+        },
+        row 1/.style={
+            nodes={
+                fill=bricklike,
+                text=white,
+                font=\bfseries
+            }
+        }
+    }
+}
+\makeatother
+
+\title{\VAR{title}}
+\BLOCK{ if author }\author{\VAR{author}}\BLOCK{ endif }
+\date{\VAR{date}}
+\BLOCK{ if institution }\institute{\VAR{institution}}\BLOCK{ endif }
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\BLOCK{ if include_toc }
+\begin{frame}{Contents}
+  \tableofcontents
+\end{frame}
+\BLOCK{ endif }
+
+\VAR{body}
+
+\end{document}
