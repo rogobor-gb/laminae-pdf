@@ -24,6 +24,8 @@ A slide is modelled as a **tagged sum type** (a discriminated union)
     \\,\\oplus\\,
     \\mathrm{Table}
     \\,\\oplus\\,
+    \\mathrm{Markdown}
+    \\,\\oplus\\,
     \\mathrm{Raw},
 
 with the field ``kind`` acting as the coproduct tag, and a report as
@@ -35,12 +37,15 @@ such as the ``n_slides == len(dict) - 1`` check used by ad-hoc dictionaries.
 
 Trust boundary
 --------------
-The escape hatch :class:`RawLatexSlide` bypasses escaping and must therefore
-never be populated from untrusted input. This is encoded in the type system
-by exposing two report classes:
+The escape hatches :class:`RawLatexSlide` and :class:`MarkdownSlide` bypass
+:func:`laminae.latex.escape_latex` and must therefore never be populated from
+untrusted input — Markdown source is parsed and typeset by the LaTeX
+``markdown`` package rather than character-escaped, since escaping would
+corrupt the Markdown syntax itself. This is encoded in the type system by
+exposing two report classes:
 
-* :class:`ReportPlan` — ``slides: list[PlannableSlide]``; excludes the raw
-  escape hatch. Its JSON schema (``ReportPlan.model_json_schema()``) is the
+* :class:`ReportPlan` — ``slides: list[PlannableSlide]``; excludes both
+  escape hatches. Its JSON schema (``ReportPlan.model_json_schema()``) is the
   contract handed to a language model for structured output.
 * :class:`Report` — ``slides: list[AnySlide]``; the renderer-facing type
   that *trusted* code may widen with :class:`RawLatexSlide`.
@@ -60,6 +65,7 @@ __all__ = [
     "ProseSlide",
     "FigureSlide",
     "TableSlide",
+    "MarkdownSlide",
     "RawLatexSlide",
     "PlannableSlide",
     "AnySlide",
@@ -186,6 +192,37 @@ class TableSlide(_SlideBase):
         return value
 
 
+class MarkdownSlide(_SlideBase):
+    """A slide rendering Markdown source via the LaTeX ``markdown`` package
+    — **trusted input only**.
+
+    The ``body`` is inserted into a ``markdown`` environment without
+    character escaping (escaping would corrupt the Markdown syntax itself).
+    It must never be populated from untrusted or model-generated input. This
+    variant is deliberately excluded from :data:`PlannableSlide` (and
+    therefore from the LLM-facing JSON schema), for the same reason as
+    :class:`RawLatexSlide`.
+
+    Parameters
+    ----------
+    title : str or None, optional
+        Frame title.
+    body : str
+        Markdown source (headings, emphasis, lists, links, code spans).
+    block : {"none", "block", "alert", "example"}, optional
+        Beamer block environment wrapping the body. ``"none"`` renders the
+        body directly on the frame.
+    block_title : str or None, optional
+        Title of the block environment (ignored when ``block == "none"``).
+    """
+
+    kind: Literal["markdown"] = "markdown"
+    title: str | None = None
+    body: str
+    block: Literal["none", "block", "alert", "example"] = "none"
+    block_title: str | None = None
+
+
 class RawLatexSlide(_SlideBase):
     """Verbatim LaTeX escape hatch — **trusted input only**.
 
@@ -204,15 +241,22 @@ class RawLatexSlide(_SlideBase):
     body: str
 
 
-#: Slides a language model is permitted to emit (no raw-LaTeX escape hatch).
+#: Slides a language model is permitted to emit (no unescaped-content hatch).
 PlannableSlide = Annotated[
     Union[SectionSlide, ProseSlide, FigureSlide, TableSlide],
     Field(discriminator="kind"),
 ]
 
-#: All slides the renderer accepts, including the trusted raw escape hatch.
+#: All slides the renderer accepts, including the trusted escape hatches.
 AnySlide = Annotated[
-    Union[SectionSlide, ProseSlide, FigureSlide, TableSlide, RawLatexSlide],
+    Union[
+        SectionSlide,
+        ProseSlide,
+        FigureSlide,
+        TableSlide,
+        MarkdownSlide,
+        RawLatexSlide,
+    ],
     Field(discriminator="kind"),
 ]
 
@@ -234,7 +278,7 @@ class ReportPlan(BaseModel):
         Document date. ``None`` defaults to LaTeX ``\\today`` at render time.
     institution : str or None, optional
         Optional affiliation shown on the title page.
-    template : {"clean", "accent"}, optional
+    template : {"clean", "accent", "ember"}, optional
         Presentational template (preamble/theme only).
     include_toc : bool, optional
         Emit a table-of-contents frame after the title page.
@@ -248,7 +292,7 @@ class ReportPlan(BaseModel):
     author: str = ""
     date: str | None = None
     institution: str | None = None
-    template: Literal["clean", "accent"] = "clean"
+    template: Literal["clean", "accent", "ember"] = "clean"
     include_toc: bool = True
     slides: list[PlannableSlide] = Field(default_factory=list)
 
