@@ -15,6 +15,7 @@ from .compile import CompilationError, compile_pdf
 from .ir import (
     AnySlide,
     FigureSlide,
+    MarkdownSlide,
     PlannableSlide,
     ProseSlide,
     RawLatexSlide,
@@ -34,6 +35,7 @@ __all__ = [
     "ProseSlide",
     "FigureSlide",
     "TableSlide",
+    "MarkdownSlide",
     "RawLatexSlide",
     "PlannableSlide",
     "AnySlide",
