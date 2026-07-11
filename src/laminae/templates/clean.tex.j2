@@ -1,0 +1,46 @@
+%------------------------------------------------------------------------------
+% laminae :: "clean" template
+% Portable: relies on fontspec defaults (Latin Modern), so it compiles on any
+% stock TeX Live / MiKTeX installation with XeLaTeX. No proprietary fonts.
+%------------------------------------------------------------------------------
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage{fontspec}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{caption}[numbered]
+
+\definecolor{ink}{HTML}{1F2933}
+\definecolor{slate}{HTML}{52606D}
+
+\setbeamercolor{title}{fg=ink}
+\setbeamercolor{frametitle}{fg=ink}
+\setbeamercolor{structure}{fg=slate}
+\setbeamercolor{normal text}{fg=ink}
+\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamerfont{title}{series=\bfseries}
+
+\title{\VAR{title}}
+\BLOCK{ if author }\author{\VAR{author}}\BLOCK{ endif }
+\date{\VAR{date}}
+\BLOCK{ if institution }\institute{\VAR{institution}}\BLOCK{ endif }
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\BLOCK{ if include_toc }
+\begin{frame}{Contents}
+  \tableofcontents
+\end{frame}
+\BLOCK{ endif }
+
+\VAR{body}
+
+\end{document}

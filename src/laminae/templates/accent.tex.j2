@@ -1,0 +1,54 @@
+%------------------------------------------------------------------------------
+% laminae :: "accent" template
+% Uses TeX Gyre fonts (libre, metric-compatible with Palatino/Helvetica),
+% which ship with TeX Live, plus a purple accent. Compiles with XeLaTeX.
+%------------------------------------------------------------------------------
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{TeX Gyre Cursor}
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{caption}[numbered]
+
+\definecolor{plum}{HTML}{5B2A86}
+\definecolor{plumdark}{HTML}{3A1A57}
+\definecolor{ink}{HTML}{241B2F}
+
+\setbeamercolor{title}{fg=plumdark}
+\setbeamercolor{frametitle}{fg=white,bg=plum}
+\setbeamercolor{structure}{fg=plum}
+\setbeamercolor{normal text}{fg=ink}
+\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamerfont{title}{series=\bfseries}
+
+\title{\VAR{title}}
+\BLOCK{ if author }\author{\VAR{author}}\BLOCK{ endif }
+\date{\VAR{date}}
+\BLOCK{ if institution }\institute{\VAR{institution}}\BLOCK{ endif }
+
+\begin{document}
+
+{%
+\setbeamertemplate{frametitle}{}
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+}
+
+\BLOCK{ if include_toc }
+\begin{frame}{Contents}
+  \tableofcontents
+\end{frame}
+\BLOCK{ endif }
+
+\VAR{body}
+
+\end{document}
