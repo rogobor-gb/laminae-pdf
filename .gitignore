@@ -1,0 +1,30 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# virtual environment
+laminae/
+.venv/
+
+# LaTeX build artefacts
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.fls
+*.fdb_latexmk
+examples/output/
+
+# macOS
+.DS_Store
+._*
+
+# Claude Code local settings (machine-specific; not shared)
+.claude/settings.local.json
