@@ -8,7 +8,7 @@ dist/
 .ruff_cache/
 
 # virtual environment
-laminae/
+/laminae/
 .venv/
 
 # LaTeX build artefacts
