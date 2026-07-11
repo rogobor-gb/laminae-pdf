@@ -104,6 +104,20 @@ def _render_prose(slide: Any) -> str:
     return "".join(parts)
 
 
+def _render_markdown(slide: Any) -> str:
+    # Trusted verbatim insertion. See laminae.ir.MarkdownSlide.
+    parts = [_begin_frame(slide.title)]
+    environment = _BLOCK_ENVIRONMENTS.get(slide.block)
+    if environment is not None:
+        block_title = escape_latex(slide.block_title) if slide.block_title else ""
+        parts.append(f"\\begin{{{environment}}}{{{block_title}}}\n")
+    parts.append("\\begin{markdown}\n" + slide.body + "\n\\end{markdown}\n")
+    if environment is not None:
+        parts.append(f"\\end{{{environment}}}\n")
+    parts.append(_end_frame())
+    return "".join(parts)
+
+
 def _render_figure(slide: Any, contents_ref: str) -> str:
     graphic = f"{contents_ref}/{slide.path}"
     if slide.full_frame:
@@ -206,6 +220,7 @@ _DISPATCH = {
     "prose": lambda s, ctx: _render_prose(s),
     "figure": lambda s, ctx: _render_figure(s, ctx["contents_ref"]),
     "table": lambda s, ctx: _render_table(s, ctx["contents_dir"]),
+    "markdown": lambda s, ctx: _render_markdown(s),
     "raw": lambda s, ctx: _render_raw(s),
 }
 
