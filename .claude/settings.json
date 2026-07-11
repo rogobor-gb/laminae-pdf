@@ -4,7 +4,27 @@
       "Bash(laminae/bin/pytest *)",
       "Bash(laminae/bin/mypy)",
       "Bash(laminae/bin/mypy *)",
-      "Bash(laminae/bin/ruff check *)"
+      "Bash(laminae/bin/ruff check *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(sed *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(ls *)",
+      "Bash(ls)",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git add *)",
+      "Bash(git commit -m *)",
+      "Bash(git diff)",
+      "Bash(git diff *)",
+      "Bash(git log)",
+      "Bash(git log *)",
+      "Bash(python3 *)",
+      "Bash(python *)",
+      "Bash(pytest *)",
+      "Bash(ruff *)",
+      "Bash(mypy *)"
     ]
   }
 }
