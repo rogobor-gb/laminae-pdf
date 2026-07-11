@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(laminae/bin/pytest *)",
+      "Bash(laminae/bin/mypy)",
+      "Bash(laminae/bin/mypy *)",
+      "Bash(laminae/bin/ruff check *)"
+    ]
+  }
+}
