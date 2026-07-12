@@ -91,3 +91,19 @@ def test_markdown_block_wraps_body() -> None:
     tex = render_tex(report, contents_dir=Path("."))
     assert "\\begin{alertblock}{Notes}" in tex
     assert "\\end{alertblock}" in tex
+
+
+def test_markdown_frame_is_fragile() -> None:
+    # Beamer requires [fragile] on frames containing a markdown environment;
+    # omitting it compiles cleanly but fails at LaTeX-engine time.
+    report = _base_report(
+        [NS(kind="markdown", title="M", body="text", block="none", block_title=None)]
+    )
+    tex = render_tex(report, contents_dir=Path("."))
+    assert "\\begin{frame}[fragile]{M}" in tex
+
+
+def test_raw_frame_is_fragile() -> None:
+    report = _base_report([NS(kind="raw", body="\\pause")])
+    tex = render_tex(report, contents_dir=Path("."))
+    assert "\\begin{frame}[fragile]\n\\pause" in tex
