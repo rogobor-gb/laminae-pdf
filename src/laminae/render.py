@@ -76,8 +76,12 @@ def _frame_title(title: str | None) -> str:
     return "" if not title else "{" + escape_latex(title) + "}"
 
 
-def _begin_frame(title: str | None) -> str:
-    return "\\begin{frame}" + _frame_title(title) + "\n"
+def _begin_frame(title: str | None, *, fragile: bool = False) -> str:
+    # [fragile] is required whenever the frame body contains content that
+    # needs non-standard catcodes to tokenize (verbatim-like environments,
+    # and — per beamer's own requirements — the `markdown` environment).
+    options = "[fragile]" if fragile else ""
+    return "\\begin{frame}" + options + _frame_title(title) + "\n"
 
 
 def _end_frame() -> str:
@@ -105,8 +109,9 @@ def _render_prose(slide: Any) -> str:
 
 
 def _render_markdown(slide: Any) -> str:
-    # Trusted verbatim insertion. See laminae.ir.MarkdownSlide.
-    parts = [_begin_frame(slide.title)]
+    # Trusted verbatim insertion. See laminae.ir.MarkdownSlide. [fragile] is
+    # required: the markdown environment needs non-standard catcodes.
+    parts = [_begin_frame(slide.title, fragile=True)]
     environment = _BLOCK_ENVIRONMENTS.get(slide.block)
     if environment is not None:
         block_title = escape_latex(slide.block_title) if slide.block_title else ""
@@ -211,8 +216,10 @@ def _render_table(slide: Any, contents_dir: Path) -> str:
 
 
 def _render_raw(slide: Any) -> str:
-    # Trusted verbatim insertion. See laminae.ir.RawLatexSlide.
-    return "\\begin{frame}\n" + slide.body + "\n\\end{frame}\n"
+    # Trusted verbatim insertion. See laminae.ir.RawLatexSlide. [fragile] is
+    # used unconditionally since arbitrary raw LaTeX may need it (verbatim,
+    # listings, ...); it is harmless for content that doesn't require it.
+    return "\\begin{frame}[fragile]\n" + slide.body + "\n\\end{frame}\n"
 
 
 _DISPATCH = {
