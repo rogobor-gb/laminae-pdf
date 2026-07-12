@@ -56,6 +56,12 @@ pdf = compile_pdf(tex, engine="xelatex")
 See `examples/demo_safe_generation.py` for a runnable end-to-end example that
 feeds every LaTeX special character through the prose path and still compiles.
 
+A report containing a `MarkdownSlide` needs `compile_pdf(tex, shell_escape=True)`:
+the `markdown` package shells out to a converter. Frames holding a
+`MarkdownSlide` or `RawLatexSlide` are rendered with beamer's `[fragile]`
+option automatically, since both may contain content that needs
+non-standard catcodes.
+
 ## The safety property, precisely
 
 Let `S = { \  &  %  $  #  _  {  }  ~  ^ }` be the text-mode special characters
