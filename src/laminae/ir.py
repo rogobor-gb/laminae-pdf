@@ -303,7 +303,11 @@ class Report(ReportPlan):
     Widens :attr:`ReportPlan.slides` to :data:`AnySlide`.
     """
 
-    slides: list[AnySlide] = Field(default_factory=list)
+    # list[] is invariant, so mypy flags this widening as unsound in general;
+    # it's safe here because pydantic revalidates slides on construction, so
+    # a Report is never handed a live list[PlannableSlide] to mutate through
+    # the wider type.
+    slides: list[AnySlide] = Field(default_factory=list)  # type: ignore[assignment]
 
     @classmethod
     def from_plan(cls, plan: ReportPlan) -> "Report":
