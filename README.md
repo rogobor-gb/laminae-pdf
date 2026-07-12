@@ -1,5 +1,8 @@
 # laminae
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
+
 Safe, auditable generation of LaTeX/Beamer documents from a **typed intermediate
 representation (IR)**. `laminae` is designed for the setting where part of a
 document is produced deterministically by code (figures, tables, computed
@@ -13,6 +16,17 @@ Its central design rule:
 This buys determinism, auditability, and immunity to LaTeX injection from model
 output, while cleanly separating *what to say* (the plan) from *how it is typeset*
 (the renderer).
+
+## Contents
+
+- [Pipeline](#pipeline)
+- [Features](#features)
+- [Quickstart](#quickstart)
+- [Templates](#templates)
+- [The safety property, precisely](#the-safety-property-precisely)
+- [Why a tagged union for the IR](#why-a-tagged-union-for-the-ir)
+- [Install](#install)
+- [Tests](#tests)
 
 ## Pipeline
 
@@ -33,6 +47,18 @@ data ── your analysis code ──▶ figures + tables (+ a "facts" table)
 * `laminae.compile` — a reentrant LaTeX→PDF compiler that never calls
   `os.chdir` (working directory is passed via `subprocess`'s `cwd`), so it is
   safe under concurrency and repeated agentic invocation.
+
+## Features
+
+- **Six slide kinds**: `Section`, `Prose`, `Figure`, `Table`, `Markdown`, and a
+  verbatim `Raw` escape hatch — each a case of one tagged-union IR.
+- **LLM-safe by construction**: the structured-output schema
+  (`ReportPlan.model_json_schema()`) excludes both `MarkdownSlide` and
+  `RawLatexSlide`, so a model can never emit unescaped LaTeX.
+- **Three presentational templates** — `clean`, `accent`, `ember` — swappable
+  without touching slide content.
+- **No LaTeX injection**: every character an LLM can influence is escaped at
+  the rendering boundary with a provably single-pass, order-independent scan.
 
 ## Quickstart
 
@@ -61,6 +87,14 @@ the `markdown` package shells out to a converter. Frames holding a
 `MarkdownSlide` or `RawLatexSlide` are rendered with beamer's `[fragile]`
 option automatically, since both may contain content that needs
 non-standard catcodes.
+
+## Templates
+
+| Template | Look | Fonts |
+| --- | --- | --- |
+| `clean` | Minimal, default beamer theme, dark ink on white | Latin Modern (ships with any stock TeX Live / MiKTeX) |
+| `accent` | Default theme with a purple frame-title accent | TeX Gyre (ships with TeX Live) |
+| `ember` | Warm orange Boadilla/crane theme; ported from the original beamerfy `chessOrange` template, with a tikz table style available to `RawLatexSlide` | Palatino, Helvetica, Monaco (system fonts — not in a stock TeX Live install) |
 
 ## The safety property, precisely
 
