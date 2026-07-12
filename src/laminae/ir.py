@@ -203,6 +203,10 @@ class MarkdownSlide(_SlideBase):
     therefore from the LLM-facing JSON schema), for the same reason as
     :class:`RawLatexSlide`.
 
+    The ``markdown`` LaTeX package shells out to a converter, so compiling a
+    report containing a ``MarkdownSlide`` requires
+    ``laminae.compile_pdf(..., shell_escape=True)``.
+
     Parameters
     ----------
     title : str or None, optional
