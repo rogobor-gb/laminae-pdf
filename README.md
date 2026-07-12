@@ -41,7 +41,7 @@ from laminae import Report, SectionSlide, ProseSlide, TableSlide, render_to_file
 
 report = Report(
     title="Monthly Commentary",
-    template="accent",                       # "clean" | "accent"
+    template="accent",                       # "clean" | "accent" | "ember"
     slides=[
         SectionSlide(title="Overview"),
         ProseSlide(title="Summary", body="Tracking error fell to 42 bps..."),
@@ -76,13 +76,15 @@ this property.
 
 ## Why a tagged union for the IR
 
-A slide is a coproduct `Section ⊕ Prose ⊕ Figure ⊕ Table ⊕ Raw` tagged by
-`kind`, and a report is `Metadata × List(Slide)`. Rendering is then a *total*
-function defined by case analysis on the tag. Adding a variant forces a new
-render case, so exhaustiveness is a type-level property rather than a runtime
-invariant (contrast the fragile `n_slides == len(dict) - 1` check that ad-hoc
-dictionaries need). The trust boundary is also encoded in types: the verbatim
-`RawLatexSlide` is excluded from `PlannableSlide`, hence from the LLM schema.
+A slide is a coproduct `Section ⊕ Prose ⊕ Figure ⊕ Table ⊕ Markdown ⊕ Raw`
+tagged by `kind`, and a report is `Metadata × List(Slide)`. Rendering is then
+a *total* function defined by case analysis on the tag. Adding a variant
+forces a new render case, so exhaustiveness is a type-level property rather
+than a runtime invariant (contrast the fragile `n_slides == len(dict) - 1`
+check that ad-hoc dictionaries need). The trust boundary is also encoded in
+types: `RawLatexSlide` (verbatim LaTeX) and `MarkdownSlide` (parsed by the
+LaTeX `markdown` package rather than escaped) are both excluded from
+`PlannableSlide`, hence from the LLM schema — only trusted code may emit them.
 
 ## Install
 
@@ -91,10 +93,12 @@ pip install -e .              # core: jinja2 + pydantic
 pip install -e ".[demo,test]" # + numpy/matplotlib for the demo, pytest for tests
 ```
 
-Requires a LaTeX distribution with XeLaTeX (TeX Live / MiKTeX) on `PATH`. The
-templates use only fonts that ship with TeX Live (Latin Modern for `clean`;
-TeX Gyre for `accent`), so they build on a stock installation with no
-proprietary fonts.
+Requires a LaTeX distribution with XeLaTeX (TeX Live / MiKTeX) on `PATH`, plus
+the `markdown` CTAN package (for `MarkdownSlide`). The `clean` and `accent`
+templates use only fonts that ship with TeX Live (Latin Modern and TeX Gyre,
+respectively), so they build on a stock installation with no proprietary
+fonts. `ember` — ported from the original beamerfy `chessOrange` template —
+additionally requires the system fonts Palatino, Helvetica, and Monaco.
 
 ## Tests
 
