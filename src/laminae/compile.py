@@ -54,6 +54,7 @@ def compile_pdf(
     passes: int = 2,
     timeout: int = 180,
     prefer_latexmk: bool = True,
+    shell_escape: bool = False,
 ) -> Path:
     """Compile a ``.tex`` file to PDF and return the output path.
 
@@ -73,6 +74,15 @@ def compile_pdf(
         Per-invocation timeout in seconds.
     prefer_latexmk : bool, optional
         Use ``latexmk`` when present (recommended); it handles rerun logic.
+    shell_escape : bool, optional
+        Pass ``-shell-escape`` to the engine, allowing it to run external
+        commands (LaTeX's ``\\write18``) during compilation. Required by
+        :class:`laminae.ir.MarkdownSlide` (the ``markdown`` package shells
+        out to a converter). **Off by default**: shell-escape lets the
+        compiled ``.tex`` source execute arbitrary commands, so only enable
+        it for a document you trust end-to-end — it is not something to flip
+        on for a report containing model-generated content beyond what
+        :mod:`laminae.render` already escapes.
 
     Returns
     -------
@@ -111,15 +121,20 @@ def compile_pdf(
             "-interaction=nonstopmode",
             "-halt-on-error",
             "-file-line-error",
-            tex_name,
         ]
+        if shell_escape:
+            command.append("-shell-escape")
+        command.append(tex_name)
         result = _run(command, workdir, timeout)
         if result.returncode != 0:
             raise CompilationError(
                 f"latexmk failed for {tex_name}:\n{_tail(result.stdout)}"
             )
     else:
-        command = ["-interaction=nonstopmode", "-halt-on-error", tex_name]
+        command = ["-interaction=nonstopmode", "-halt-on-error"]
+        if shell_escape:
+            command.append("-shell-escape")
+        command.append(tex_name)
         for _ in range(max(1, passes)):
             result = _run([engine, *command], workdir, timeout)
             if result.returncode != 0:
