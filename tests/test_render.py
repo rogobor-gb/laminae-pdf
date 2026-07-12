@@ -64,3 +64,30 @@ def test_figure_reference_uses_contents_prefix(tmp_path: Path) -> None:
 def test_accent_template_selects_pagella(tmp_path: Path) -> None:
     tex = render_tex(_base_report([], template="accent"), contents_dir=tmp_path)
     assert "TeX Gyre Pagella" in tex
+
+
+def test_ember_template_selects_boadilla_crane(tmp_path: Path) -> None:
+    tex = render_tex(_base_report([], template="ember"), contents_dir=tmp_path)
+    assert "\\usetheme{Boadilla}" in tex
+    assert "\\usecolortheme{crane}" in tex
+
+
+def test_markdown_body_is_not_escaped(tmp_path: Path) -> None:
+    report = _base_report(
+        [NS(kind="markdown", title="M", body="# Heading\n\n*em* & 100%",
+            block="none", block_title=None)]
+    )
+    tex = render_tex(report, contents_dir=tmp_path)
+    assert "\\begin{markdown}" in tex and "\\end{markdown}" in tex
+    # Markdown source is inserted verbatim, not character-escaped.
+    assert "# Heading\n\n*em* & 100%" in tex
+
+
+def test_markdown_block_wraps_body() -> None:
+    report = _base_report(
+        [NS(kind="markdown", title="M", body="text", block="alert",
+            block_title="Notes")]
+    )
+    tex = render_tex(report, contents_dir=Path("."))
+    assert "\\begin{alertblock}{Notes}" in tex
+    assert "\\end{alertblock}" in tex
