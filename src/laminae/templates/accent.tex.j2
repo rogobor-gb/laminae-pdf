@@ -6,9 +6,19 @@
 \documentclass[aspectratio=169]{beamer}
 
 \usepackage{fontspec}
-\setmainfont{TeX Gyre Pagella}
-\setsansfont{TeX Gyre Heros}
-\setmonofont{TeX Gyre Cursor}
+% TeX Gyre ships with TeX Live, but a stock macOS does not register it with the
+% system font database, so a by-family lookup (\setmainfont{TeX Gyre Pagella})
+% fails there. Load the OpenType files by name instead: kpathsea finds them in
+% the TeX tree, so this resolves identically on Linux and macOS.
+\setmainfont{texgyrepagella}[
+  Extension=.otf, UprightFont=*-regular, BoldFont=*-bold,
+  ItalicFont=*-italic, BoldItalicFont=*-bolditalic]
+\setsansfont{texgyreheros}[
+  Extension=.otf, UprightFont=*-regular, BoldFont=*-bold,
+  ItalicFont=*-italic, BoldItalicFont=*-bolditalic]
+\setmonofont{texgyrecursor}[
+  Extension=.otf, UprightFont=*-regular, BoldFont=*-bold,
+  ItalicFont=*-italic, BoldItalicFont=*-bolditalic]
 
 \usepackage{booktabs}
 \usepackage{graphicx}

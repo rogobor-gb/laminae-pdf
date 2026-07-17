@@ -63,7 +63,8 @@ def test_figure_reference_uses_contents_prefix(tmp_path: Path) -> None:
 
 def test_accent_template_selects_pagella(tmp_path: Path) -> None:
     tex = render_tex(_base_report([], template="accent"), contents_dir=tmp_path)
-    assert "TeX Gyre Pagella" in tex
+    # Loaded by OpenType filename (portable across Linux/macOS), not by family.
+    assert "texgyrepagella" in tex
 
 
 def test_ember_template_selects_boadilla_crane(tmp_path: Path) -> None:
