@@ -341,12 +341,6 @@ def _write_assets(contents: Path) -> None:
     _fig_majority_vote(regions, contents / "majority_vote.png")
     _fig_timeline(contents / "timeline.png")
 
-    (contents / "product_utility.csv").write_text(
-        "Product,Utility U_k(theta)\n"
-        "IT — sparse index tracking,-TE_k(theta) - lambda * Turnover_k(theta)\n"
-        "IT+ — index tracking plus,-|mean ExcessRet_k(theta)|\n",
-        encoding="utf-8",
-    )
     (contents / "persistence.csv").write_text(
         "Pi(i->j),W1,W2,W3,W4\n"
         "W0,0.86,0.79,0.74,0.71\n"
@@ -384,9 +378,9 @@ def build_report(template: str) -> Report:
     characters, which is exactly the injection-proofing the library is for.
     """
     return Report(
-        title="Selecting a Parameter in a Stability Region",
+        title="Selecting a Parameter in a Stability Region under Non-Stationarity",
         author="G. Breschi",
-        institution="Strategy Research — Pipeline step 5.2",
+        institution="Strategy Quantitative Research",
         template=template,  # type: ignore[arg-type]
         include_toc=True,
         slides=[
@@ -426,11 +420,6 @@ def build_report(template: str) -> Report:
                 ),
                 block="example",
                 block_title="Change of mindset",
-            ),
-            TableSlide(
-                title="Product-specific utility",
-                path="product_utility.csv",
-                first_col_is_index=True,
             ),
             # ---- Rank surface & regions ----------------------------------- #
             SectionSlide(title="Rank surface and regions"),
@@ -555,7 +544,7 @@ def build_report(template: str) -> Report:
             SectionSlide(title="Diagnostics and output"),
             TableSlide(title="Failure modes", path="failure_modes.csv"),
             ProseSlide(
-                title="What 5.2 outputs",
+                title="What the process outputs",
                 body=(
                     "The deliverable is not merely the parameter but the whole "
                     "selection rule f: history -> theta*, encoding the windows, "
